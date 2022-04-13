@@ -1,5 +1,7 @@
 package tech.brito.ead.authuser.domain.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.exceptions.UserNotFoundException;
@@ -49,5 +51,9 @@ public class UserService {
         if (optionalSavedUser.isPresent() && !optionalSavedUser.get().equals(user)) {
             throw new DomainRuleException(String.format("There is already a registered user with the username %s", user.getEmail()));
         }
+    }
+
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 }

@@ -1,4 +1,4 @@
-package tech.brito.ead.authuser.validations;
+package tech.brito.ead.authuser.core.validations;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

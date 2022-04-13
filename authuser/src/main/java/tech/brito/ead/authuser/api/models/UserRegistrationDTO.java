@@ -2,7 +2,7 @@ package tech.brito.ead.authuser.api.models;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.br.CPF;
-import tech.brito.ead.authuser.validations.Username;
+import tech.brito.ead.authuser.core.validations.Username;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

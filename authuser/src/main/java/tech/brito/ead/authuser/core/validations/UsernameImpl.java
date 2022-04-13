@@ -1,4 +1,4 @@
-package tech.brito.ead.authuser.validations;
+package tech.brito.ead.authuser.core.validations;
 
 import org.apache.commons.lang3.StringUtils;
 

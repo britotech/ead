@@ -1,6 +1,9 @@
 package tech.brito.ead.authuser.api.controllers;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.models.ImageUpdateDTO;
 import tech.brito.ead.authuser.api.models.PasswordUpdateDTO;
@@ -10,7 +13,6 @@ import tech.brito.ead.authuser.domain.models.User;
 import tech.brito.ead.authuser.domain.services.UserService;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,8 +30,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.findAll();
+    public Page<User> getAllUsers(@PageableDefault(sort = "username") Pageable pageable) {
+        return userService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
