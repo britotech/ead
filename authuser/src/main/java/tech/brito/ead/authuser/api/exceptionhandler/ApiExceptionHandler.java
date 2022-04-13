@@ -22,6 +22,7 @@ import tech.brito.ead.authuser.domain.exceptions.EntityInUseException;
 import tech.brito.ead.authuser.domain.exceptions.EntityNotFoundException;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -51,7 +52,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, String title) {
-        return Problem.builder().title(title).status(status.value()).userMessage(MSG_INTERNAL_ERROR).timestamp(LocalDateTime.now());
+        return Problem.builder().title(title).status(status.value()).userMessage(MSG_INTERNAL_ERROR).timestamp(OffsetDateTime.now());
     }
 
     private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, ProblemType problemType, String detail) {
@@ -66,7 +67,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 .title(problemType.getTitle())
                 .detail(detail)
                 .userMessage(userMessage)
-                .timestamp(LocalDateTime.now());
+                .timestamp(OffsetDateTime.now());
     }
 
     @Override
