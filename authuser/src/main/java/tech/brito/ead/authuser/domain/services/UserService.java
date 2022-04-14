@@ -7,6 +7,7 @@ import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.exceptions.UserNotFoundException;
 import tech.brito.ead.authuser.domain.models.User;
 import tech.brito.ead.authuser.domain.repositories.UserRepository;
+import tech.brito.ead.authuser.core.specifications.SpecificationTemplate;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -53,7 +54,7 @@ public class UserService {
         }
     }
 
-    public Page<User> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<User> findAll(SpecificationTemplate.UserSpec spec, Pageable pageable) {
+        return userRepository.findAll(spec, pageable);
     }
 }

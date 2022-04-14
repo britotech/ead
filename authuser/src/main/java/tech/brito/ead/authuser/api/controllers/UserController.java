@@ -11,6 +11,7 @@ import tech.brito.ead.authuser.api.models.UserUpdateDTO;
 import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.models.User;
 import tech.brito.ead.authuser.domain.services.UserService;
+import tech.brito.ead.authuser.core.specifications.SpecificationTemplate;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -30,8 +31,8 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<User> getAllUsers(@PageableDefault(sort = "username") Pageable pageable) {
-        return userService.findAll(pageable);
+    public Page<User> getAllUsers(SpecificationTemplate.UserSpec spec, @PageableDefault(sort = "username") Pageable pageable) {
+        return userService.findAll(spec, pageable);
     }
 
     @GetMapping("/{id}")
