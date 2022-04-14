@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.hateoas.RepresentationModel;
 import tech.brito.ead.authuser.domain.enums.UserStatus;
 import tech.brito.ead.authuser.domain.enums.UserType;
 
@@ -19,7 +20,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "tb_user")
-public class User implements Serializable {
+public class User extends RepresentationModel<User> implements Serializable {
 
     private static final long serialVersionUID = 1l;
 

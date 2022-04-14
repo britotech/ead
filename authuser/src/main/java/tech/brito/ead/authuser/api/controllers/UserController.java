@@ -8,13 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.models.ImageUpdateDTO;
 import tech.brito.ead.authuser.api.models.PasswordUpdateDTO;
 import tech.brito.ead.authuser.api.models.UserUpdateDTO;
+import tech.brito.ead.authuser.core.specifications.SpecificationTemplate;
 import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.models.User;
 import tech.brito.ead.authuser.domain.services.UserService;
-import tech.brito.ead.authuser.core.specifications.SpecificationTemplate;
 
 import javax.validation.Valid;
 import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -32,7 +35,11 @@ public class UserController {
 
     @GetMapping
     public Page<User> getAllUsers(SpecificationTemplate.UserSpec spec, @PageableDefault(sort = "username") Pageable pageable) {
-        return userService.findAll(spec, pageable);
+        var userPage = userService.findAll(spec, pageable);
+        userPage.toList().forEach(user -> {
+            user.add(linkTo(methodOn(UserController.class).getUser(user.getId())).withSelfRel());
+        });
+        return userPage;
     }
 
     @GetMapping("/{id}")
