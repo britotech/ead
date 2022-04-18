@@ -1,14 +1,11 @@
-package tech.brito.ead.authuser.domain.models;
+package tech.brito.ead.course.domain.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.hateoas.RepresentationModel;
-import tech.brito.ead.authuser.domain.enums.UserStatus;
-import tech.brito.ead.authuser.domain.enums.UserType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,8 +16,8 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "tb_user")
-public class User extends RepresentationModel<User> implements Serializable {
+@Table(name = "tb_lesson")
+public class Lesson implements Serializable {
 
     private static final long serialVersionUID = 1l;
 
@@ -37,26 +34,15 @@ public class User extends RepresentationModel<User> implements Serializable {
     @Column(name = "last_update_date_time", columnDefinition = "timestamp")
     private OffsetDateTime lastUpdateDateTime;
 
-    private String username;
+    private String title;
 
-    private String email;
+    private String description;
 
-    private String cpf;
+    @Column(name = "video_url")
+    private String videoUrl;
 
-    private String fullname;
-
-    @JsonIgnore
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    private UserStatus status;
-
-    @Enumerated(EnumType.STRING)
-    private UserType type;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(name = "image_url")
-    private String imageUrl;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "module_id")
+    private Module module;
 }

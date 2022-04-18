@@ -1,26 +1,29 @@
-package tech.brito.ead.authuser.domain.models;
+package tech.brito.ead.course.domain.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.hateoas.RepresentationModel;
-import tech.brito.ead.authuser.domain.enums.UserStatus;
-import tech.brito.ead.authuser.domain.enums.UserType;
+import tech.brito.ead.course.domain.enums.CourseLevel;
+import tech.brito.ead.course.domain.enums.CourseStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "tb_user")
-public class User extends RepresentationModel<User> implements Serializable {
+@Table(name = "tb_course")
+public class Course extends RepresentationModel<Course> implements Serializable {
 
     private static final long serialVersionUID = 1l;
 
@@ -37,26 +40,24 @@ public class User extends RepresentationModel<User> implements Serializable {
     @Column(name = "last_update_date_time", columnDefinition = "timestamp")
     private OffsetDateTime lastUpdateDateTime;
 
-    private String username;
+    private String name;
 
-    private String email;
-
-    private String cpf;
-
-    private String fullname;
-
-    @JsonIgnore
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    private UserStatus status;
-
-    @Enumerated(EnumType.STRING)
-    private UserType type;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    private String description;
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    private CourseLevel level;
+
+    @Enumerated(EnumType.STRING)
+    private CourseStatus status;
+
+    @Column(name = "user_instructor_id")
+    private UUID userInstructor;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    Set<Module> modules;
 }
