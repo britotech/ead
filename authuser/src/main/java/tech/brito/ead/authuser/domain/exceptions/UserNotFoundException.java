@@ -11,6 +11,6 @@ public class UserNotFoundException extends EntityNotFoundException {
     }
 
     public UserNotFoundException(UUID id) {
-        this(String.format("User not found for ID:%d", id));
+        this(String.format("User not found for ID:%s", id));
     }
 }

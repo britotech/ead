@@ -1,19 +1,20 @@
 package tech.brito.ead.course.domain.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
-@Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+import static java.util.Objects.isNull;
+import static tech.brito.ead.course.core.constants.DataConstants.DATE_TIME_FORMAT_UTC;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "tb_lesson")
@@ -21,17 +22,18 @@ public class Lesson implements Serializable {
 
     private static final long serialVersionUID = 1l;
 
-    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @CreationTimestamp
     @Column(name = "creation_date_time", columnDefinition = "timestamp")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_UTC)
     private OffsetDateTime creationDateTime;
 
     @UpdateTimestamp
     @Column(name = "last_update_date_time", columnDefinition = "timestamp")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_UTC)
     private OffsetDateTime lastUpdateDateTime;
 
     private String title;
@@ -45,4 +47,28 @@ public class Lesson implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "module_id")
     private Module module;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (isNull(o) || getClass() != o.getClass() || isNull(id)) {
+            return false;
+        }
+
+        Lesson lesson = (Lesson) o;
+        return id.equals(lesson.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Lesson{id=" + id + ", title=" + title + ", description=" + description + "}";
+    }
 }

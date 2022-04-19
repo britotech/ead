@@ -30,6 +30,7 @@ public class CourseService {
     public Page<Course> findAll(SpecificationTemplate.CourseSpec spec, Pageable pageable) {
         return courseRepository.findAll(spec, pageable);
     }
+
     @Transactional
     public void delete(Course course) {
         deleteLinkedModules(course.getId());

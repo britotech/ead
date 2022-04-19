@@ -11,6 +11,6 @@ public class CourseNotFoundException extends EntityNotFoundException {
     }
 
     public CourseNotFoundException(UUID id) {
-        this(String.format("Course not found for ID:%d", id));
+        this(String.format("Course not found for ID:%s", id));
     }
 }

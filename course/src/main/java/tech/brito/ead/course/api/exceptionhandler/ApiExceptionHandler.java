@@ -25,7 +25,6 @@ import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static tech.brito.ead.course.api.exceptionhandler.MessageExceptionHandler.*;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -51,11 +50,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, String title) {
-        return Problem.builder().title(title).status(status.value()).userMessage(MSG_INTERNAL_ERROR).timestamp(OffsetDateTime.now());
+        return Problem.builder().title(title).status(status.value()).userMessage(MessageExceptionHandler.MSG_INTERNAL_ERROR).timestamp(OffsetDateTime.now());
     }
 
     private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, ProblemType problemType, String detail) {
-        return createProblemBuilder(status, problemType, detail, MSG_INTERNAL_ERROR);
+        return createProblemBuilder(status, problemType, detail, MessageExceptionHandler.MSG_INTERNAL_ERROR);
     }
 
     private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, ProblemType problemType, String detail, String userMessage) {
@@ -75,7 +74,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                                    HttpStatus status,
                                                                    WebRequest request) {
 
-        var detail = String.format(MSG_RESOURCE_NOT_FOUND, ex.getRequestURL());
+        var detail = String.format(MessageExceptionHandler.MSG_RESOURCE_NOT_FOUND, ex.getRequestURL());
         var problem = createProblemBuilder(status, ProblemType.RESOURCE_NOT_FOUND, detail).build();
         return handleExceptionInternal(ex, problem, headers, status, request);
     }
@@ -93,7 +92,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             return handlePropertyBinding(propertyEx, headers, status, request);
         }
 
-        var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INCOMPREHENSIBLE_MESSAGE, MSG_INVALID_BODY).build();
+        var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INCOMPREHENSIBLE_MESSAGE, MessageExceptionHandler.MSG_INVALID_BODY).build();
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
     }
 
@@ -103,7 +102,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                       WebRequest request) {
 
         var path = joinPatch(ex);
-        var detail = String.format(MSG_PROPERTY_INVALID_TYPE, path, ex.getValue(), ex.getTargetType().getSimpleName());
+        var detail = String.format(MessageExceptionHandler.MSG_PROPERTY_INVALID_TYPE, path, ex.getValue(), ex.getTargetType().getSimpleName());
         var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INCOMPREHENSIBLE_MESSAGE, detail).build();
 
         return handleExceptionInternal(ex, problem, headers, status, request);
@@ -119,7 +118,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                         WebRequest request) {
 
         var path = joinPatch(ex);
-        var detail = String.format(MSG_PROPERTY_NOT_RECOGNIZED, path, ex.getReferringClass());
+        var detail = String.format(MessageExceptionHandler.MSG_PROPERTY_NOT_RECOGNIZED, path, ex.getReferringClass());
         var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INCOMPREHENSIBLE_MESSAGE, detail).build();
 
         return handleExceptionInternal(ex, problem, headers, status, request);
@@ -134,7 +133,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         var fieldErrors = ex.getBindingResult().getFieldErrors();
         var problemFields = fieldErrors.stream().map(fieldError -> createProblemField(fieldError)).collect(Collectors.toList());
 
-        var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INVALID_DATA, MSG_INVALID_PROPERTY, MSG_INVALID_PROPERTY)
+        var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INVALID_DATA, MessageExceptionHandler.MSG_INVALID_PROPERTY, MessageExceptionHandler.MSG_INVALID_PROPERTY)
                 .fields(problemFields)
                 .build();
 
@@ -152,12 +151,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         String detail;
 
         if (type.isEnum()) {
-            detail = String.format(MSG_ENUM_PARAMETER_INVALID_TYPE,
+            detail = String.format(MessageExceptionHandler.MSG_ENUM_PARAMETER_INVALID_TYPE,
                                    ex.getName(),
                                    ex.getValue(),
                                    StringUtils.join(type.getEnumConstants(), ", "));
         } else {
-            detail = String.format(MSG_PARAMETER_INVALID_TYPE, ex.getName(), ex.getValue(), type.getSimpleName());
+            detail = String.format(MessageExceptionHandler.MSG_PARAMETER_INVALID_TYPE, ex.getName(), ex.getValue(), type.getSimpleName());
         }
 
         var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INVALID_PARAMETER, detail).build();
@@ -166,7 +165,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUncaught(Exception ex, WebRequest request) {
-        var problem = createProblemBuilder(HttpStatus.INTERNAL_SERVER_ERROR, ProblemType.SYSTEM_FAILURE, MSG_INTERNAL_ERROR).build();
+        var problem = createProblemBuilder(HttpStatus.INTERNAL_SERVER_ERROR, ProblemType.SYSTEM_FAILURE, MessageExceptionHandler.MSG_INTERNAL_ERROR).build();
         return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 

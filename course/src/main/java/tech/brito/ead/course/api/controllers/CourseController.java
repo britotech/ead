@@ -54,10 +54,10 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteCourse(@PathVariable UUID id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCourse(@PathVariable UUID id) {
         var course = courseService.findById(id);
         courseService.delete(course);
-        return "Course removed successfully";
     }
 
     @PutMapping("/{id}")

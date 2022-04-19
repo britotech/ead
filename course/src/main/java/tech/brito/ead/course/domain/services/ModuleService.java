@@ -1,11 +1,13 @@
 package tech.brito.ead.course.domain.services;
 
 import org.springframework.stereotype.Service;
+import tech.brito.ead.course.domain.exceptions.ModuleNotFoundException;
+import tech.brito.ead.course.domain.models.Module;
 import tech.brito.ead.course.domain.repositories.LessonRepository;
 import tech.brito.ead.course.domain.repositories.ModuleRepository;
-import tech.brito.ead.course.domain.models.Module;
 
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 @Service
 public class ModuleService {
@@ -27,5 +29,14 @@ public class ModuleService {
         }
 
         moduleRepository.delete(module);
+    }
+
+    @Transactional
+    public Module save(Module module) {
+        return moduleRepository.save(module);
+    }
+
+    public Module findModuleIntoCourse(UUID courseId, UUID moduleId) {
+        return moduleRepository.findModuleIntoCourse(courseId, moduleId).orElseThrow(() -> new ModuleNotFoundException());
     }
 }
