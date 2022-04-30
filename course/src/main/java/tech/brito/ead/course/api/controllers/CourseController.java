@@ -3,11 +3,11 @@ package tech.brito.ead.course.api.controllers;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.course.api.models.CourseDto;
-import tech.brito.ead.course.core.specifications.SpecificationTemplate;
 import tech.brito.ead.course.domain.models.Course;
 import tech.brito.ead.course.domain.services.CourseService;
 
@@ -32,7 +32,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public Page<Course> getAllCourses(SpecificationTemplate.CourseSpec spec, @PageableDefault(sort = "name") Pageable pageable) {
+    public Page<Course> getAllCourses(Specification<Course> spec, @PageableDefault(sort = "name") Pageable pageable) {
         var userPage = courseService.findAll(spec, pageable);
         userPage.toList().forEach(course -> {
             course.add(linkTo(methodOn(CourseController.class).getCourse(course.getId())).withSelfRel());

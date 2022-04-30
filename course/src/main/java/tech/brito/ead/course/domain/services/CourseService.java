@@ -2,6 +2,7 @@ package tech.brito.ead.course.domain.services;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import tech.brito.ead.course.core.specifications.SpecificationTemplate;
 import tech.brito.ead.course.domain.exceptions.CourseNotFoundException;
@@ -27,7 +28,7 @@ public class CourseService {
         this.lessonRepository = lessonRepository;
     }
 
-    public Page<Course> findAll(SpecificationTemplate.CourseSpec spec, Pageable pageable) {
+    public Page<Course> findAll(Specification<Course> spec, Pageable pageable) {
         return courseRepository.findAll(spec, pageable);
     }
 

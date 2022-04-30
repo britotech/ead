@@ -3,8 +3,11 @@ package tech.brito.ead.course.domain.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,10 +18,12 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 import static tech.brito.ead.course.core.constants.DataConstants.DATE_TIME_FORMAT_UTC;
 
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "tb_lesson")
-public class Lesson implements Serializable {
+public class Lesson extends RepresentationModel<Lesson> implements Serializable {
 
     private static final long serialVersionUID = 1l;
 

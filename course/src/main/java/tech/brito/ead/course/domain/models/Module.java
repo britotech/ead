@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,7 +26,7 @@ import static tech.brito.ead.course.core.constants.DataConstants.DATE_TIME_FORMA
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "tb_module")
-public class Module implements Serializable {
+public class Module extends RepresentationModel<Module> implements Serializable {
 
     private static final long serialVersionUID = 1l;
 

@@ -1,5 +1,8 @@
 package tech.brito.ead.course.domain.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import tech.brito.ead.course.domain.exceptions.ModuleNotFoundException;
 import tech.brito.ead.course.domain.models.Module;
@@ -37,6 +40,14 @@ public class ModuleService {
     }
 
     public Module findModuleIntoCourse(UUID courseId, UUID moduleId) {
-        return moduleRepository.findModuleIntoCourse(courseId, moduleId).orElseThrow(() -> new ModuleNotFoundException());
+        return moduleRepository.findByCourseIdAndId(courseId, moduleId).orElseThrow(() -> new ModuleNotFoundException());
+    }
+
+    public Page<Module> findAllByCourse(Specification<Module> spec, Pageable pageable) {
+        return moduleRepository.findAll(spec, pageable);
+    }
+
+    public Module findById(UUID moduleId) {
+        return moduleRepository.findById(moduleId).orElseThrow(() -> new ModuleNotFoundException());
     }
 }
