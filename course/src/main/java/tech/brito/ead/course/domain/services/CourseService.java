@@ -3,10 +3,15 @@ package tech.brito.ead.course.domain.services;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import tech.brito.ead.course.api.clients.AuthUserClient;
 import tech.brito.ead.course.domain.exceptions.CourseNotFoundException;
+import tech.brito.ead.course.domain.exceptions.DomainRuleException;
 import tech.brito.ead.course.domain.models.Course;
 import tech.brito.ead.course.domain.repositories.CourseRepository;
+import tech.brito.ead.course.domain.repositories.CourseUserRepository;
 import tech.brito.ead.course.domain.repositories.LessonRepository;
 import tech.brito.ead.course.domain.repositories.ModuleRepository;
 
@@ -15,16 +20,22 @@ import java.util.UUID;
 
 @Service
 public class CourseService {
-
     private final CourseRepository courseRepository;
     private final ModuleRepository moduleRepository;
-
     private final LessonRepository lessonRepository;
+    private final AuthUserClient authUserClient;
+    private final CourseUserRepository courseUserRepository;
 
-    public CourseService(CourseRepository courseRepository, ModuleRepository moduleRepository, LessonRepository lessonRepository) {
+    public CourseService(CourseRepository courseRepository,
+                         ModuleRepository moduleRepository,
+                         LessonRepository lessonRepository,
+                         AuthUserClient authUserClient,
+                         CourseUserRepository courseUserRepository) {
         this.courseRepository = courseRepository;
         this.moduleRepository = moduleRepository;
         this.lessonRepository = lessonRepository;
+        this.authUserClient = authUserClient;
+        this.courseUserRepository = courseUserRepository;
     }
 
     public Page<Course> findAll(Specification<Course> spec, Pageable pageable) {
@@ -34,6 +45,7 @@ public class CourseService {
     @Transactional
     public void delete(Course course) {
         deleteLinkedModules(course.getId());
+        deleteLinkedCourseUsers(course.getId());
         courseRepository.delete(course);
     }
 
@@ -52,8 +64,32 @@ public class CourseService {
         }
     }
 
+    private void deleteLinkedCourseUsers(UUID courseId) {
+        var courseUsers = courseUserRepository.findAllByCourseId(courseId);
+        if (!courseUsers.isEmpty()) {
+            courseUserRepository.deleteAll(courseUsers);
+        }
+    }
+
     public Course save(Course course) {
+        validateUserInstructor(course.getUserInstructor());
         return courseRepository.save(course);
+    }
+
+    private void validateUserInstructor(UUID userInstructor) {
+
+        try {
+            var userDto = authUserClient.getUserById(userInstructor);
+            if (userDto.getType().isStudent()) {
+                throw new DomainRuleException("User must be INSTRUCTOR or ADMIN.");
+            }
+        } catch (HttpStatusCodeException ex) {
+            if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+                throw new DomainRuleException("Instructor not found.");
+            }
+
+            throw ex;
+        }
     }
 
     public Course findById(UUID id) {

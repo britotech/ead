@@ -3,7 +3,6 @@ package tech.brito.ead.course.api.controllers;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class CourseController {
 
     private final CourseService courseService;
-
     private final ModelMapper modelMapper;
 
     public CourseController(CourseService courseService, ModelMapper modelMapper) {
