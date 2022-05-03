@@ -6,10 +6,12 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.jpa.domain.Specification;
 import tech.brito.ead.course.domain.models.Course;
+import tech.brito.ead.course.domain.models.CourseUser;
 import tech.brito.ead.course.domain.models.Lesson;
 import tech.brito.ead.course.domain.models.Module;
 
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -31,6 +33,13 @@ public class SpecificationTemplate {
     public interface LessonSpec extends Specification<Lesson> {
     }
 
+    public static Specification<Course> courseUserId(final UUID userId){
+        return ((root, query, cb) -> {
+            query.distinct(true);
+            Join<Course, CourseUser> userCourse = root.join("courseUsers");
+            return cb.equal(userCourse.get("userId"), userId);
+        });
+    }
     public static Specification<Module> moduleCourseId(final UUID courseId) {
         return ((root, query, cb) -> {
             query.distinct(true);

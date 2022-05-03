@@ -45,9 +45,9 @@ public class LessonController {
         return lessonService.save(lesson);
     }
 
-    @PutMapping("/modules/{moduleId}/lessons/{id}")
-    public Lesson updateModule(@PathVariable UUID moduleId, @PathVariable UUID id, @RequestBody @Valid LessonDto lessonDto) {
-        var lesson = lessonService.findLessonIntoModule(moduleId, id);
+    @PutMapping("/modules/{moduleId}/lessons/{lessonId}")
+    public Lesson updateModule(@PathVariable UUID moduleId, @PathVariable UUID lessonId, @RequestBody @Valid LessonDto lessonDto) {
+        var lesson = lessonService.findLessonIntoModule(moduleId, lessonId);
         lesson.setDescription(lessonDto.getDescription());
         lesson.setTitle(lessonDto.getTitle());
         lesson.setVideoUrl(lessonDto.getVideoUrl());
@@ -55,10 +55,10 @@ public class LessonController {
         return lessonService.save(lesson);
     }
 
-    @DeleteMapping("/modules/{moduleId}/lessons/{id}")
+    @DeleteMapping("/modules/{moduleId}/lessons/{lessonId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteModule(@PathVariable UUID moduleId, @PathVariable UUID id) {
-        var lesson = lessonService.findLessonIntoModule(moduleId, id);
+    public void deleteModule(@PathVariable UUID moduleId, @PathVariable UUID lessonId) {
+        var lesson = lessonService.findLessonIntoModule(moduleId, lessonId);
         lessonService.delete(lesson);
     }
 
@@ -74,8 +74,8 @@ public class LessonController {
         return lessonPage;
     }
 
-    @GetMapping("/modules/{moduleId}/lessons/{id}")
-    public Lesson getLesson(@PathVariable UUID moduleId, @PathVariable UUID id) {
-        return lessonService.findLessonIntoModule(moduleId, id);
+    @GetMapping("/modules/{moduleId}/lessons/{lessonId}")
+    public Lesson getLesson(@PathVariable UUID moduleId, @PathVariable UUID lessonId) {
+        return lessonService.findLessonIntoModule(moduleId, lessonId);
     }
 }

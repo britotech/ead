@@ -56,7 +56,7 @@ public class Module extends RepresentationModel<Module> implements Serializable 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "module", fetch = FetchType.LAZY)
     @Fetch(FetchMode.SUBSELECT)
-    Set<Lesson> lessons;
+    private Set<Lesson> lessons;
 
     @Override
     public boolean equals(Object o) {

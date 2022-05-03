@@ -1,4 +1,4 @@
-package tech.brito.ead.course.domain.enums;
+package tech.brito.ead.authuser.enums;
 
 public enum CourseLevel {
 

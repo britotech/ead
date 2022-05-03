@@ -2,7 +2,6 @@ package tech.brito.ead.course.api.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -44,18 +43,18 @@ public class ModuleController {
         return moduleService.save(module);
     }
 
-    @PutMapping("/courses/{courseId}/modules/{id}")
-    public Module updateModule(@PathVariable UUID courseId, @PathVariable UUID id, @RequestBody @Valid ModuleDto moduleDto) {
-        var module = moduleService.findModuleIntoCourse(courseId, id);
+    @PutMapping("/courses/{courseId}/modules/{moduleId}")
+    public Module updateModule(@PathVariable UUID courseId, @PathVariable UUID moduleId, @RequestBody @Valid ModuleDto moduleDto) {
+        var module = moduleService.findModuleIntoCourse(courseId, moduleId);
         module.setDescription(moduleDto.getDescription());
         module.setTitle(moduleDto.getTitle());
         return moduleService.save(module);
     }
 
-    @DeleteMapping("/courses/{courseId}/modules/{id}")
+    @DeleteMapping("/courses/{courseId}/modules/{moduleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteModule(@PathVariable UUID courseId, @PathVariable UUID id) {
-        var module = moduleService.findModuleIntoCourse(courseId, id);
+    public void deleteModule(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
+        var module = moduleService.findModuleIntoCourse(courseId, moduleId);
         moduleService.delete(module);
     }
 
@@ -70,8 +69,8 @@ public class ModuleController {
         return modulePage;
     }
 
-    @GetMapping("/courses/{courseId}/modules/{id}")
-    public Module getModule(@PathVariable UUID courseId, @PathVariable UUID id) {
-        return moduleService.findModuleIntoCourse(courseId, id);
+    @GetMapping("/courses/{courseId}/modules/{moduleId}")
+    public Module getModule(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
+        return moduleService.findModuleIntoCourse(courseId, moduleId);
     }
 }

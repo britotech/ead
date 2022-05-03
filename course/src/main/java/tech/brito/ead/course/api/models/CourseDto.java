@@ -1,8 +1,8 @@
 package tech.brito.ead.course.api.models;
 
 import lombok.Data;
-import tech.brito.ead.course.domain.enums.CourseLevel;
-import tech.brito.ead.course.domain.enums.CourseStatus;
+import tech.brito.ead.course.enums.CourseLevel;
+import tech.brito.ead.course.enums.CourseStatus;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

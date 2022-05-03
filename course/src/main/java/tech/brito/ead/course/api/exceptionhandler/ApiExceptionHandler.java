@@ -3,6 +3,7 @@ package tech.brito.ead.course.api.exceptionhandler;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.internal.util.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
@@ -20,12 +21,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import tech.brito.ead.course.domain.exceptions.DomainRuleException;
 import tech.brito.ead.course.domain.exceptions.EntityInUseException;
 import tech.brito.ead.course.domain.exceptions.EntityNotFoundException;
+import tech.brito.ead.course.domain.exceptions.SubscriptionAlreadyExistsException;
 
 import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
+@Log4j2
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -50,7 +53,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, String title) {
-        return Problem.builder().title(title).status(status.value()).userMessage(MessageExceptionHandler.MSG_INTERNAL_ERROR).timestamp(OffsetDateTime.now());
+        return Problem
+                .builder()
+                .title(title)
+                .status(status.value())
+                .userMessage(MessageExceptionHandler.MSG_INTERNAL_ERROR)
+                .timestamp(OffsetDateTime.now());
     }
 
     private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, ProblemType problemType, String detail) {
@@ -92,7 +100,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             return handlePropertyBinding(propertyEx, headers, status, request);
         }
 
-        var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INCOMPREHENSIBLE_MESSAGE, MessageExceptionHandler.MSG_INVALID_BODY).build();
+        var problem = createProblemBuilder(HttpStatus.BAD_REQUEST,
+                                           ProblemType.INCOMPREHENSIBLE_MESSAGE,
+                                           MessageExceptionHandler.MSG_INVALID_BODY).build();
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
     }
 
@@ -102,7 +112,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                       WebRequest request) {
 
         var path = joinPatch(ex);
-        var detail = String.format(MessageExceptionHandler.MSG_PROPERTY_INVALID_TYPE, path, ex.getValue(), ex.getTargetType().getSimpleName());
+        var detail =
+                String.format(MessageExceptionHandler.MSG_PROPERTY_INVALID_TYPE, path, ex.getValue(), ex.getTargetType().getSimpleName());
         var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INCOMPREHENSIBLE_MESSAGE, detail).build();
 
         return handleExceptionInternal(ex, problem, headers, status, request);
@@ -133,9 +144,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         var fieldErrors = ex.getBindingResult().getFieldErrors();
         var problemFields = fieldErrors.stream().map(fieldError -> createProblemField(fieldError)).collect(Collectors.toList());
 
-        var problem = createProblemBuilder(HttpStatus.BAD_REQUEST, ProblemType.INVALID_DATA, MessageExceptionHandler.MSG_INVALID_PROPERTY, MessageExceptionHandler.MSG_INVALID_PROPERTY)
-                .fields(problemFields)
-                .build();
+        var problem = createProblemBuilder(HttpStatus.BAD_REQUEST,
+                                           ProblemType.INVALID_DATA,
+                                           MessageExceptionHandler.MSG_INVALID_PROPERTY,
+                                           MessageExceptionHandler.MSG_INVALID_PROPERTY).fields(problemFields).build();
 
         return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
@@ -165,7 +177,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUncaught(Exception ex, WebRequest request) {
-        var problem = createProblemBuilder(HttpStatus.INTERNAL_SERVER_ERROR, ProblemType.SYSTEM_FAILURE, MessageExceptionHandler.MSG_INTERNAL_ERROR).build();
+        log.error("handleUncaught ->", ex);
+        var problem = createProblemBuilder(HttpStatus.INTERNAL_SERVER_ERROR,
+                                           ProblemType.SYSTEM_FAILURE,
+                                           MessageExceptionHandler.MSG_INTERNAL_ERROR).build();
         return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -185,6 +200,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EntityInUseException.class)
     public ResponseEntity<?> handleEntityInUse(EntityInUseException ex, WebRequest request) {
         var problem = createProblemBuilder(HttpStatus.CONFLICT, ProblemType.ENTITY_IN_USE, ex.getMessage(), ex.getMessage()).build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(SubscriptionAlreadyExistsException.class)
+    public ResponseEntity<?> handleSubscriptionAlreadyExists(SubscriptionAlreadyExistsException ex, WebRequest request) {
+        var problem = createProblemBuilder(HttpStatus.CONFLICT,
+                                           ProblemType.SUBSCRIPTION_ALREADY_EXISTS,
+                                           ex.getMessage(),
+                                           ex.getMessage()).build();
 
         return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }

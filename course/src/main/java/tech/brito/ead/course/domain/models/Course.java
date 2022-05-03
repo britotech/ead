@@ -10,8 +10,8 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.hateoas.RepresentationModel;
-import tech.brito.ead.course.domain.enums.CourseLevel;
-import tech.brito.ead.course.domain.enums.CourseStatus;
+import tech.brito.ead.course.enums.CourseLevel;
+import tech.brito.ead.course.enums.CourseStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -65,7 +65,12 @@ public class Course extends RepresentationModel<Course> implements Serializable 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     @Fetch(FetchMode.SUBSELECT)
-    Set<Module> modules;
+    private Set<Module> modules;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<CourseUser> courseUsers;
 
     @Override
     public boolean equals(Object o) {

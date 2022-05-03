@@ -3,6 +3,7 @@ package tech.brito.ead.authuser.api.exceptionhandler;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.internal.util.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
@@ -20,14 +21,15 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.exceptions.EntityInUseException;
 import tech.brito.ead.authuser.domain.exceptions.EntityNotFoundException;
+import tech.brito.ead.authuser.domain.exceptions.SubscriptionAlreadyExistsException;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static tech.brito.ead.authuser.api.exceptionhandler.MessageExceptionHandler.*;
 
+@Log4j2
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -167,6 +169,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUncaught(Exception ex, WebRequest request) {
+        log.error("handleUncaught ->", ex);
         var problem = createProblemBuilder(HttpStatus.INTERNAL_SERVER_ERROR, ProblemType.SYSTEM_FAILURE, MSG_INTERNAL_ERROR).build();
         return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
@@ -187,6 +190,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EntityInUseException.class)
     public ResponseEntity<?> handleEntityInUse(EntityInUseException ex, WebRequest request) {
         var problem = createProblemBuilder(HttpStatus.CONFLICT, ProblemType.ENTITY_IN_USE, ex.getMessage(), ex.getMessage()).build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(SubscriptionAlreadyExistsException.class)
+    public ResponseEntity<?> handleSubscriptionAlreadyExists(SubscriptionAlreadyExistsException ex, WebRequest request) {
+        var problem = createProblemBuilder(HttpStatus.CONFLICT,
+                                           ProblemType.SUBSCRIPTION_ALREADY_EXISTS,
+                                           ex.getMessage(),
+                                           ex.getMessage()).build();
 
         return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }

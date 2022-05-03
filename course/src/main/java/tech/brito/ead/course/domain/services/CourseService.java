@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import tech.brito.ead.course.core.specifications.SpecificationTemplate;
 import tech.brito.ead.course.domain.exceptions.CourseNotFoundException;
 import tech.brito.ead.course.domain.models.Course;
 import tech.brito.ead.course.domain.repositories.CourseRepository;
@@ -58,6 +57,6 @@ public class CourseService {
     }
 
     public Course findById(UUID id) {
-        return courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException(id));
+        return courseRepository.findById(id).orElseThrow(CourseNotFoundException::new);
     }
 }

@@ -1,4 +1,4 @@
-package tech.brito.ead.authuser.domain.enums;
+package tech.brito.ead.course.enums;
 
 public enum UserType {
     ADMIN,

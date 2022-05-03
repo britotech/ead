@@ -16,6 +16,7 @@ import tech.brito.ead.authuser.domain.services.UserService;
 import javax.validation.Valid;
 import java.util.UUID;
 
+import static java.util.Objects.nonNull;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -34,29 +35,38 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<User> getAllUsers(SpecificationTemplate.UserSpec spec, @PageableDefault(sort = "username") Pageable pageable) {
-        var userPage = userService.findAll(spec, pageable);
+    public Page<User> getAllUsers(SpecificationTemplate.UserSpec spec,
+                                  @PageableDefault(sort = "username") Pageable pageable,
+                                  @RequestParam(required = false) UUID courseId) {
+
+        Page<User> userPage = null;
+        if (nonNull(courseId)) {
+            userPage = userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), pageable);
+        } else {
+            userPage = userService.findAll(spec, pageable);
+        }
+
         userPage.toList().forEach(user -> {
             user.add(linkTo(methodOn(UserController.class).getUser(user.getId())).withSelfRel());
         });
         return userPage;
     }
 
-    @GetMapping("/{id}")
-    public User getUser(@PathVariable UUID id) {
-        return userService.findById(id);
+    @GetMapping("/{userId}")
+    public User getUser(@PathVariable UUID userId) {
+        return userService.findById(userId);
     }
 
-    @PutMapping("/{id}")
-    public User updateUser(@PathVariable UUID id, @RequestBody @Valid UserUpdateDTO userDto) {
-        var userSaved = userService.findById(id);
+    @PutMapping("/{userId}")
+    public User updateUser(@PathVariable UUID userId, @RequestBody @Valid UserUpdateDTO userDto) {
+        var userSaved = userService.findById(userId);
         modelMapper.map(userDto, userSaved);
         return userService.save(userSaved);
     }
 
-    @PutMapping("/{id}/password")
-    public String updatePassword(@PathVariable UUID id, @RequestBody @Valid PasswordUpdateDTO passwordDTO) {
-        var userSaved = userService.findById(id);
+    @PutMapping("/{userId}/password")
+    public String updatePassword(@PathVariable UUID userId, @RequestBody @Valid PasswordUpdateDTO passwordDTO) {
+        var userSaved = userService.findById(userId);
         if (!userSaved.getPassword().equals(passwordDTO.getOldPassword())) {
             throw new DomainRuleException("Old password does not match user's current password");
         }
@@ -66,9 +76,9 @@ public class UserController {
         return "Password updated sucessfully";
     }
 
-    @PutMapping("/{id}/image")
-    public String updateImage(@PathVariable UUID id, @RequestBody @Valid ImageUpdateDTO imageDTO) {
-        var userSaved = userService.findById(id);
+    @PutMapping("/{userId}/image")
+    public String updateImage(@PathVariable UUID userId, @RequestBody @Valid ImageUpdateDTO imageDTO) {
+        var userSaved = userService.findById(userId);
         userSaved.setImageUrl(imageDTO.getImageUrl());
         userService.save(userSaved);
         return "Image updated sucessfully";
