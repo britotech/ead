@@ -45,8 +45,11 @@ public class CourseService {
     @Transactional
     public void delete(Course course) {
         deleteLinkedModules(course.getId());
-        deleteLinkedCourseUsers(course.getId());
+        var hasCourseUsersExcluded = deleteLinkedCourseUsers(course.getId());
         courseRepository.delete(course);
+        if(hasCourseUsersExcluded){
+            authUserClient.deleteCourseInAuthUser(course.getId());
+        }
     }
 
     private void deleteLinkedModules(UUID courseId) {
@@ -64,11 +67,15 @@ public class CourseService {
         }
     }
 
-    private void deleteLinkedCourseUsers(UUID courseId) {
+    private boolean deleteLinkedCourseUsers(UUID courseId) {
         var courseUsers = courseUserRepository.findAllByCourseId(courseId);
-        if (!courseUsers.isEmpty()) {
+        var hasCourseUsers = !courseUsers.isEmpty();
+
+        if (hasCourseUsers) {
             courseUserRepository.deleteAll(courseUsers);
         }
+
+        return hasCourseUsers;
     }
 
     public Course save(Course course) {

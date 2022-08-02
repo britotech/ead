@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.course.api.models.CourseUserDto;
 import tech.brito.ead.course.api.models.SubscriptionDto;
 import tech.brito.ead.course.api.models.UserDto;
+import tech.brito.ead.course.domain.exceptions.EntityNotFoundException;
 import tech.brito.ead.course.domain.services.CourseService;
 import tech.brito.ead.course.domain.services.CourseUserService;
 
@@ -28,6 +29,7 @@ public class CourseUserController {
 
     @GetMapping("/courses/{courseId}/users")
     public Page<UserDto> getAllUsersByCourse(@PathVariable UUID courseId, @PageableDefault(sort = "username") Pageable pageable) {
+        var course = courseService.findById(courseId);
         return courseUserService.getAllUsersByCourse(courseId, pageable);
     }
 
@@ -36,5 +38,16 @@ public class CourseUserController {
     public CourseUserDto saveSubscriptionUserInCourse(@PathVariable UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {
         var course = courseService.findById(courseId);
         return courseUserService.saveAndSendSubscriptionUserInCourse(course, subscriptionDto.getUserId());
+    }
+
+    @DeleteMapping("courses/users/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserCourseByCourse(@PathVariable UUID userId) {
+
+        if (!courseUserService.existsByUserId(userId)) {
+            throw new EntityNotFoundException("CourseUser not found");
+        }
+
+        courseUserService.deleteAllCourseUserByUser(userId);
     }
 }

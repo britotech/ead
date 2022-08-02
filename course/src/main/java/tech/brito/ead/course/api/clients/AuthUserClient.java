@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -56,8 +57,14 @@ public class AuthUserClient {
         log.info("Url -> {}", url);
         return restTemplate.exchange(url, HttpMethod.GET, null, UserDto.class).getBody();
     }
+
     public void postSubscriptionUserInCourse(CourseUserDto courseUserDto) {
         var url = String.format("%s/users/%s/courses/subscription", REQUEST_URI_AUTH_USER, courseUserDto.getUserId());
         restTemplate.postForObject(url, courseUserDto, String.class);
+    }
+
+    public void deleteCourseInAuthUser(UUID courseId) {
+        var url = String.format("%s/users/courses/%s", REQUEST_URI_AUTH_USER, courseId);
+        restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
     }
 }

@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.models.ImageUpdateDTO;
 import tech.brito.ead.authuser.api.models.PasswordUpdateDTO;
@@ -82,5 +83,12 @@ public class UserController {
         userSaved.setImageUrl(imageDTO.getImageUrl());
         userService.save(userSaved);
         return "Image updated sucessfully";
+    }
+
+    @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable UUID userId) {
+        var user = userService.findById(userId);
+        userService.delete(user);
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import tech.brito.ead.authuser.api.clients.CourseClient;
 import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.exceptions.UserNotFoundException;
 import tech.brito.ead.authuser.domain.models.User;
@@ -17,9 +18,13 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserCourseService userCourseService;
+    private final CourseClient courseClient;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserCourseService userCourseService, CourseClient courseClient) {
         this.userRepository = userRepository;
+        this.userCourseService = userCourseService;
+        this.courseClient = courseClient;
     }
 
     public List<User> findAll() {
@@ -56,5 +61,23 @@ public class UserService {
 
     public Page<User> findAll(Specification<User> spec, Pageable pageable) {
         return userRepository.findAll(spec, pageable);
+    }
+
+    @Transactional
+    public void delete(User user) {
+        var hasUserCoursesExcluded = deleteLinkedUserCourses(user);
+        userRepository.delete(user);
+        if(hasUserCoursesExcluded){
+            courseClient.deleteUserInCourse(user.getId());
+        }
+    }
+
+    private boolean deleteLinkedUserCourses(User user){
+        var userCourses = userCourseService.findAllByUser(user);
+        var hasUserCoursesExcluded = !userCourses.isEmpty();
+        if(hasUserCoursesExcluded){
+            userCourseService.deleteAll(userCourses);
+        }
+        return hasUserCoursesExcluded;
     }
 }

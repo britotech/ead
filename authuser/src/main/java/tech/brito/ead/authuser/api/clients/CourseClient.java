@@ -47,4 +47,9 @@ public class CourseClient {
         url.append(pageable.getSort().toString().replaceAll(": ", ","));
         return url.toString();
     }
+
+    public void deleteUserInCourse(UUID userId) {
+        var url = String.format("%s/courses/users/%s", REQUEST_URI_COURSE, userId);
+        restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+    }
 }

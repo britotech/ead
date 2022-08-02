@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.models.CourseDTO;
 import tech.brito.ead.authuser.api.models.UserCourseDto;
+import tech.brito.ead.authuser.domain.exceptions.EntityNotFoundException;
 import tech.brito.ead.authuser.domain.services.UserCourseService;
 import tech.brito.ead.authuser.domain.services.UserService;
 
@@ -38,5 +39,16 @@ public class UserCourseController {
         userCourseDto.setId(userCourse.getId());
         userCourseDto.setUserId(id);
         return userCourseDto;
+    }
+
+    @DeleteMapping("users/courses/{courseId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserCourseByCourse(@PathVariable UUID courseId) {
+
+        if (!userCourseService.existsByCourseId(courseId)) {
+            throw new EntityNotFoundException("UserCourse not found");
+        }
+
+        userCourseService.deleteAllUserCourseByCourse(courseId);
     }
 }

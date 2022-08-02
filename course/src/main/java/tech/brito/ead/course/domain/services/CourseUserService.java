@@ -32,6 +32,10 @@ public class CourseUserService {
         return authUserClient.getAllUsersByCourse(courseId, pageable);
     }
 
+    public boolean existsByUserId(UUID userId) {
+        return courseUserRepository.existsByUserId(userId);
+    }
+
     @Transactional
     public CourseUserDto saveAndSendSubscriptionUserInCourse(Course course, UUID userId) {
         validateSubscriptionUserInCourse(course, userId);
@@ -67,5 +71,10 @@ public class CourseUserService {
 
             throw ex;
         }
+    }
+
+    @Transactional
+    public void deleteAllCourseUserByUser(UUID userId) {
+        courseUserRepository.deleteAllByUserId(userId);
     }
 }

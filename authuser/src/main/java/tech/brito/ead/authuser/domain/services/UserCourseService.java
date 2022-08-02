@@ -10,6 +10,8 @@ import tech.brito.ead.authuser.domain.models.User;
 import tech.brito.ead.authuser.domain.models.UserCourse;
 import tech.brito.ead.authuser.domain.repositories.UserCourseRepository;
 
+import javax.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,7 +30,7 @@ public class UserCourseService {
         return courseClient.getAllCoursesByUser(userId, pageable);
     }
 
-    public UserCourse saveSubscriptionUserInCourse(User user, UUID courseId){
+    public UserCourse saveSubscriptionUserInCourse(User user, UUID courseId) {
         validateSubscriptionUserInCourse(user, courseId);
         var userCourse = new UserCourse(user, courseId);
         return userCourseRepository.save(userCourse);
@@ -40,5 +42,22 @@ public class UserCourseService {
         if (optionalUserCourse.isPresent()) {
             throw new SubscriptionAlreadyExistsException();
         }
+    }
+
+    public boolean existsByCourseId(UUID courseId) {
+        return userCourseRepository.existsByCourseId(courseId);
+    }
+
+    @Transactional
+    public void deleteAllUserCourseByCourse(UUID courseId) {
+        userCourseRepository.deleteAllByCourseId(courseId);
+    }
+
+    public List<UserCourse> findAllByUser(User user) {
+        return userCourseRepository.findAllByUser(user);
+    }
+
+    public void deleteAll(List<UserCourse> userCourses) {
+        userCourseRepository.deleteAll(userCourses);
     }
 }
