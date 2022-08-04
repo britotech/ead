@@ -5,12 +5,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tech.brito.ead.course.api.models.CourseUserDto;
-import tech.brito.ead.course.api.models.SubscriptionDto;
-import tech.brito.ead.course.api.models.UserDto;
-import tech.brito.ead.course.domain.exceptions.EntityNotFoundException;
+import tech.brito.ead.course.core.specifications.SpecificationTemplate;
+import tech.brito.ead.course.domain.models.SubscriptionDto;
+import tech.brito.ead.course.domain.models.User;
 import tech.brito.ead.course.domain.services.CourseService;
-import tech.brito.ead.course.domain.services.CourseUserService;
+import tech.brito.ead.course.domain.services.UserService;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -20,34 +19,25 @@ import java.util.UUID;
 public class CourseUserController {
 
     private final CourseService courseService;
-    private final CourseUserService courseUserService;
+    private final UserService userService;
 
-    public CourseUserController(CourseService courseService, CourseUserService courseUserService) {
+    public CourseUserController(CourseService courseService, UserService userService) {
         this.courseService = courseService;
-        this.courseUserService = courseUserService;
+        this.userService = userService;
     }
 
     @GetMapping("/courses/{courseId}/users")
-    public Page<UserDto> getAllUsersByCourse(@PathVariable UUID courseId, @PageableDefault(sort = "username") Pageable pageable) {
+    public Page<User> getAllUsersByCourse(SpecificationTemplate.UserSpec spec,
+                                          @PathVariable UUID courseId,
+                                          @PageableDefault(sort = "username") Pageable pageable) {
         var course = courseService.findById(courseId);
-        return courseUserService.getAllUsersByCourse(courseId, pageable);
+        return userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), pageable);
     }
 
     @PostMapping("/courses/{courseId}/users/subscription")
     @ResponseStatus(HttpStatus.CREATED)
-    public CourseUserDto saveSubscriptionUserInCourse(@PathVariable UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {
+    public void saveSubscriptionUserInCourse(@PathVariable UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {
         var course = courseService.findById(courseId);
-        return courseUserService.saveAndSendSubscriptionUserInCourse(course, subscriptionDto.getUserId());
-    }
 
-    @DeleteMapping("courses/users/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserCourseByCourse(@PathVariable UUID userId) {
-
-        if (!courseUserService.existsByUserId(userId)) {
-            throw new EntityNotFoundException("CourseUser not found");
-        }
-
-        courseUserService.deleteAllCourseUserByUser(userId);
     }
 }

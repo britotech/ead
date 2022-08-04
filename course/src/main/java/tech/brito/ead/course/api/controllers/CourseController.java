@@ -6,9 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tech.brito.ead.course.api.models.CourseDto;
 import tech.brito.ead.course.core.specifications.SpecificationTemplate;
 import tech.brito.ead.course.domain.models.Course;
+import tech.brito.ead.course.domain.models.CourseDto;
 import tech.brito.ead.course.domain.services.CourseService;
 
 import javax.validation.Valid;
@@ -37,6 +37,7 @@ public class CourseController {
                                       @RequestParam(required = false) UUID userId) {
 
         Page<Course> userPage = null;
+
         if (nonNull(userId)) {
             userPage = courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), pageable);
         } else {
@@ -46,6 +47,7 @@ public class CourseController {
         userPage.toList().forEach(course -> {
             course.add(linkTo(methodOn(CourseController.class).getCourse(course.getId())).withSelfRel());
         });
+
         return userPage;
     }
 

@@ -3,7 +3,6 @@ package tech.brito.ead.authuser.domain.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,7 +15,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -67,10 +65,6 @@ public class User extends RepresentationModel<User> implements Serializable {
 
     @Column(name = "image_url")
     private String imageUrl;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private Set<UserCourse> userCourses;
 
     @Override
     public boolean equals(Object o) {

@@ -1,4 +1,4 @@
-package tech.brito.ead.course.api.models;
+package tech.brito.ead.course.domain.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

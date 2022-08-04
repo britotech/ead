@@ -17,7 +17,6 @@ import tech.brito.ead.authuser.domain.services.UserService;
 import javax.validation.Valid;
 import java.util.UUID;
 
-import static java.util.Objects.nonNull;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -36,20 +35,12 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<User> getAllUsers(SpecificationTemplate.UserSpec spec,
-                                  @PageableDefault(sort = "username") Pageable pageable,
-                                  @RequestParam(required = false) UUID courseId) {
-
-        Page<User> userPage = null;
-        if (nonNull(courseId)) {
-            userPage = userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), pageable);
-        } else {
-            userPage = userService.findAll(spec, pageable);
-        }
-
+    public Page<User> getAllUsers(SpecificationTemplate.UserSpec spec, @PageableDefault(sort = "username") Pageable pageable) {
+        Page<User> userPage = userService.findAll(spec, pageable);
         userPage.toList().forEach(user -> {
             user.add(linkTo(methodOn(UserController.class).getUser(user.getId())).withSelfRel());
         });
+
         return userPage;
     }
 

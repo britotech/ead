@@ -68,9 +68,9 @@ public class Course extends RepresentationModel<Course> implements Serializable 
     private Set<Module> modules;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    @Fetch(FetchMode.SUBSELECT)
-    private Set<CourseUser> courseUsers;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "tb_course_users", joinColumns = @JoinColumn(name = "course_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> users;
 
     @Override
     public boolean equals(Object o) {

@@ -6,7 +6,7 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.jpa.domain.Specification;
 import tech.brito.ead.course.domain.models.Course;
-import tech.brito.ead.course.domain.models.CourseUser;
+import tech.brito.ead.course.domain.models.User;
 import tech.brito.ead.course.domain.models.Lesson;
 import tech.brito.ead.course.domain.models.Module;
 
@@ -24,6 +24,14 @@ public class SpecificationTemplate {
           @Spec(path = "userInstructor", spec = Equal.class)})
     public interface CourseSpec extends Specification<Course> {
     }
+    @And({
+            @Spec(path = "email", spec = LikeIgnoreCase.class),
+            @Spec(path = "fullname;", spec = LikeIgnoreCase.class),
+            @Spec(path = "status", spec = Equal.class),
+            @Spec(path = "type", spec = Equal.class)
+    })
+    public interface UserSpec extends Specification<User> {
+    }
 
     @Spec(path = "title", spec = LikeIgnoreCase.class)
     public interface ModuleSpec extends Specification<Module> {
@@ -33,13 +41,6 @@ public class SpecificationTemplate {
     public interface LessonSpec extends Specification<Lesson> {
     }
 
-    public static Specification<Course> courseUserId(final UUID userId){
-        return ((root, query, cb) -> {
-            query.distinct(true);
-            Join<Course, CourseUser> userCourse = root.join("courseUsers");
-            return cb.equal(userCourse.get("userId"), userId);
-        });
-    }
     public static Specification<Module> moduleCourseId(final UUID courseId) {
         return ((root, query, cb) -> {
             query.distinct(true);
@@ -59,6 +60,28 @@ public class SpecificationTemplate {
             Expression<Collection<Lesson>> moduleLessons = module.get("lessons");
 
             return cb.and(cb.equal(module.get("id"), moduleId), cb.isMember(lesson, moduleLessons));
+        });
+    }
+
+    public static Specification<User> userCourseId(final UUID courseId) {
+        return ((root, query, cb) -> {
+            query.distinct(true);
+            var user = root;
+            var course = query.from(Course.class);
+            Expression<Collection<User>> coursesUsers = course.get("users");
+
+            return cb.and(cb.equal(course.get("id"), courseId), cb.isMember(user, coursesUsers));
+        });
+    }
+
+    public static Specification<Course> courseUserId(final UUID userId) {
+        return ((root, query, cb) -> {
+            query.distinct(true);
+            var course = root;
+            var user = query.from(User.class);
+            Expression<Collection<Course>> usersCourses = user.get("courses");
+
+            return cb.and(cb.equal(user.get("id"), userId), cb.isMember(course, usersCourses));
         });
     }
 }

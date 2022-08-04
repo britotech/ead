@@ -18,12 +18,10 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserCourseService userCourseService;
     private final CourseClient courseClient;
 
-    public UserService(UserRepository userRepository, UserCourseService userCourseService, CourseClient courseClient) {
+    public UserService(UserRepository userRepository, CourseClient courseClient) {
         this.userRepository = userRepository;
-        this.userCourseService = userCourseService;
         this.courseClient = courseClient;
     }
 
@@ -65,19 +63,6 @@ public class UserService {
 
     @Transactional
     public void delete(User user) {
-        var hasUserCoursesExcluded = deleteLinkedUserCourses(user);
         userRepository.delete(user);
-        if(hasUserCoursesExcluded){
-            courseClient.deleteUserInCourse(user.getId());
-        }
-    }
-
-    private boolean deleteLinkedUserCourses(User user){
-        var userCourses = userCourseService.findAllByUser(user);
-        var hasUserCoursesExcluded = !userCourses.isEmpty();
-        if(hasUserCoursesExcluded){
-            userCourseService.deleteAll(userCourses);
-        }
-        return hasUserCoursesExcluded;
     }
 }

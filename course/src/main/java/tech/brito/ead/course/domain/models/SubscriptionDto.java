@@ -1,4 +1,4 @@
-package tech.brito.ead.authuser.api.models;
+package tech.brito.ead.course.domain.models;
 
 import lombok.Data;
 
@@ -7,14 +7,10 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Data
-public class UserCourseDto implements Serializable {
+public class SubscriptionDto implements Serializable {
 
     private static final long serialVersionUID = 1l;
 
-    private UUID id;
-
-    private UUID userId;
-
     @NotNull
-    private UUID courseId;
+    private UUID userId;
 }

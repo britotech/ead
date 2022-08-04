@@ -29,7 +29,8 @@ public class CourseClient {
 
         var url = generateUrlCoursesByUser(userId, pageable);
         log.info("Url -> {}", url);
-        var responseType = new ParameterizedTypeReference<ResponsePageDto<CourseDTO>>() {};
+        var responseType = new ParameterizedTypeReference<ResponsePageDto<CourseDTO>>() {
+        };
         ResponseEntity<ResponsePageDto<CourseDTO>> result = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
         return result.getBody();
     }
@@ -46,10 +47,5 @@ public class CourseClient {
         url.append("&sort=");
         url.append(pageable.getSort().toString().replaceAll(": ", ","));
         return url.toString();
-    }
-
-    public void deleteUserInCourse(UUID userId) {
-        var url = String.format("%s/courses/users/%s", REQUEST_URI_COURSE, userId);
-        restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
     }
 }

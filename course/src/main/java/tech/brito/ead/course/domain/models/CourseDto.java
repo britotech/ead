@@ -1,4 +1,4 @@
-package tech.brito.ead.course.api.models;
+package tech.brito.ead.course.domain.models;
 
 import lombok.Data;
 import tech.brito.ead.course.enums.CourseLevel;

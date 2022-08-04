@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tech.brito.ead.course.api.models.LessonDto;
+import tech.brito.ead.course.domain.models.LessonDto;
 import tech.brito.ead.course.core.specifications.SpecificationTemplate;
 import tech.brito.ead.course.domain.models.Lesson;
 import tech.brito.ead.course.domain.services.LessonService;
