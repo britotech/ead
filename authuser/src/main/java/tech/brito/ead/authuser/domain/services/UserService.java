@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import tech.brito.ead.authuser.api.clients.CourseClient;
 import tech.brito.ead.authuser.api.models.UserEventDTO;
-import tech.brito.ead.authuser.api.models.enums.ActionType;
+import tech.brito.ead.authuser.enums.ActionType;
 import tech.brito.ead.authuser.core.publishers.UserEventPublisher;
 import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.exceptions.UserNotFoundException;

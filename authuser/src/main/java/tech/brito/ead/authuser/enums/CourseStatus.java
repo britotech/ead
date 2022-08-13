@@ -1,4 +1,4 @@
-package tech.brito.ead.authuser.api.models.enums;
+package tech.brito.ead.authuser.enums;
 
 public enum CourseStatus {
 

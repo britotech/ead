@@ -25,7 +25,7 @@ public class UserConsumer {
         this.userService = userService;
     }
 
-    @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "${ead.broker.queue.name}", durable = "true"),
+    @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "${ead.broker.queue.userEventQueue.name}", durable = "true"),
                                              exchange = @Exchange(value = "${ead.broker.exchange.userEventExchange}",
                                                                   type = ExchangeTypes.FANOUT, ignoreDeclarationExceptions = "true")))
     public void listenUserEvent(@Payload UserEventDTO userEventDTO) {

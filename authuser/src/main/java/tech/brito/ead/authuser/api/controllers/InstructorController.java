@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.models.InstructorDTO;
 import tech.brito.ead.authuser.domain.models.User;
 import tech.brito.ead.authuser.domain.services.UserService;
-import tech.brito.ead.authuser.api.models.enums.UserType;
+import tech.brito.ead.authuser.enums.UserType;
 
 import javax.validation.Valid;
 
