@@ -26,6 +26,7 @@ public class User implements Serializable {
     @Id
     private UUID id;
 
+    private String username;
     private String email;
 
     private String cpf;
@@ -37,9 +38,6 @@ public class User implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private UserType type;
-
-    @Column(name = "image_url")
-    private String imageUrl;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)

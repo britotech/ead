@@ -6,6 +6,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.course.core.specifications.SpecificationTemplate;
+import tech.brito.ead.course.domain.exceptions.DomainRuleException;
 import tech.brito.ead.course.domain.models.SubscriptionDto;
 import tech.brito.ead.course.domain.models.User;
 import tech.brito.ead.course.domain.services.CourseService;
@@ -36,8 +37,14 @@ public class CourseUserController {
 
     @PostMapping("/courses/{courseId}/users/subscription")
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveSubscriptionUserInCourse(@PathVariable UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {
+    public String saveSubscriptionUserInCourse(@PathVariable UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {
         var course = courseService.findById(courseId);
+        var user = userService.findOptionalById(subscriptionDto.getUserId());
+        if (!user.isPresent()) {
+            throw new DomainRuleException("User not found");
+        }
 
+        courseService.saveSubscriptionUserInCourse(course, user.get());
+        return "Subscription created sucessfully";
     }
 }

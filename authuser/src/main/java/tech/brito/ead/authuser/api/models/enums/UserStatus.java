@@ -1,4 +1,4 @@
-package tech.brito.ead.authuser.enums;
+package tech.brito.ead.authuser.api.models.enums;
 
 public enum UserStatus {
     ACTIVE,

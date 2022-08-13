@@ -18,10 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import tech.brito.ead.course.domain.exceptions.DomainRuleException;
-import tech.brito.ead.course.domain.exceptions.EntityInUseException;
-import tech.brito.ead.course.domain.exceptions.EntityNotFoundException;
-import tech.brito.ead.course.domain.exceptions.SubscriptionAlreadyExistsException;
+import tech.brito.ead.course.domain.exceptions.*;
 
 import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
@@ -206,6 +203,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SubscriptionAlreadyExistsException.class)
     public ResponseEntity<?> handleSubscriptionAlreadyExists(SubscriptionAlreadyExistsException ex, WebRequest request) {
+        var problem = createProblemBuilder(HttpStatus.CONFLICT,
+                                           ProblemType.SUBSCRIPTION_ALREADY_EXISTS,
+                                           ex.getMessage(),
+                                           ex.getMessage()).build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(UserBlockedException.class)
+    public ResponseEntity<?> handleUserBlocked(UserBlockedException ex, WebRequest request) {
         var problem = createProblemBuilder(HttpStatus.CONFLICT,
                                            ProblemType.SUBSCRIPTION_ALREADY_EXISTS,
                                            ex.getMessage(),

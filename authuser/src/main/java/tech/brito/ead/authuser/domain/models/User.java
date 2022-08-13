@@ -8,8 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.hateoas.RepresentationModel;
-import tech.brito.ead.authuser.enums.UserStatus;
-import tech.brito.ead.authuser.enums.UserType;
+import tech.brito.ead.authuser.api.models.enums.UserStatus;
+import tech.brito.ead.authuser.api.models.enums.UserType;
 
 import javax.persistence.*;
 import java.io.Serializable;

@@ -1,10 +1,14 @@
 package tech.brito.ead.authuser.domain.services;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import tech.brito.ead.authuser.api.clients.CourseClient;
+import tech.brito.ead.authuser.api.models.UserEventDTO;
+import tech.brito.ead.authuser.api.models.enums.ActionType;
+import tech.brito.ead.authuser.core.publishers.UserEventPublisher;
 import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.exceptions.UserNotFoundException;
 import tech.brito.ead.authuser.domain.models.User;
@@ -19,10 +23,18 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CourseClient courseClient;
+    private final UserEventPublisher userEventPublisher;
 
-    public UserService(UserRepository userRepository, CourseClient courseClient) {
+    private final ModelMapper modelMapper;
+
+    public UserService(UserRepository userRepository,
+                       CourseClient courseClient,
+                       UserEventPublisher userEventPublisher,
+                       ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.courseClient = courseClient;
+        this.userEventPublisher = userEventPublisher;
+        this.modelMapper = modelMapper;
     }
 
     public List<User> findAll() {
@@ -34,7 +46,27 @@ public class UserService {
     }
 
     @Transactional
-    public User save(User user) {
+    public User saveUser(User user) {
+        user = save(user);
+        var userDTO = modelMapper.map(user, UserEventDTO.class);
+        userEventPublisher.publishUserEvent(userDTO, ActionType.CREATE);
+        return user;
+    }
+
+    @Transactional
+    public User updateUser(User user) {
+        user = save(user);
+        var userDTO = modelMapper.map(user, UserEventDTO.class);
+        userEventPublisher.publishUserEvent(userDTO, ActionType.UPDATE);
+        return user;
+    }
+
+    @Transactional
+    public User updatePassword(User user) {
+        return userRepository.save(user);
+    }
+
+    private User save(User user) {
         validateEmailAllowed(user);
         validateUsernameAllowed(user);
 
@@ -64,5 +96,7 @@ public class UserService {
     @Transactional
     public void delete(User user) {
         userRepository.delete(user);
+        var userDTO = modelMapper.map(user, UserEventDTO.class);
+        userEventPublisher.publishUserEvent(userDTO, ActionType.DELETE);
     }
 }

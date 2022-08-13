@@ -5,8 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.models.UserRegistrationDTO;
-import tech.brito.ead.authuser.enums.UserStatus;
-import tech.brito.ead.authuser.enums.UserType;
+import tech.brito.ead.authuser.api.models.enums.UserStatus;
+import tech.brito.ead.authuser.api.models.enums.UserType;
 import tech.brito.ead.authuser.domain.models.User;
 import tech.brito.ead.authuser.domain.services.UserService;
 
@@ -35,6 +35,6 @@ public class AuthenticationController {
         user.setStatus(UserStatus.ACTIVE);
         user.setType(UserType.STUDENT);
 
-        return userService.save(user);
+        return userService.saveUser(user);
     }
 }

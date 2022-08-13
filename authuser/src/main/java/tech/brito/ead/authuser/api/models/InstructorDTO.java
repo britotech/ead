@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Data
-public class InstructorDto implements Serializable {
+public class InstructorDTO implements Serializable {
 
     private static final long serialVersionUID = 1l;
 

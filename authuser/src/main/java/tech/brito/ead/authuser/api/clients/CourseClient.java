@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import tech.brito.ead.authuser.api.models.CourseDTO;
-import tech.brito.ead.authuser.api.models.ResponsePageDto;
+import tech.brito.ead.authuser.api.models.ResponsePageDTO;
 
 import java.util.UUID;
 
@@ -29,9 +29,9 @@ public class CourseClient {
 
         var url = generateUrlCoursesByUser(userId, pageable);
         log.info("Url -> {}", url);
-        var responseType = new ParameterizedTypeReference<ResponsePageDto<CourseDTO>>() {
+        var responseType = new ParameterizedTypeReference<ResponsePageDTO<CourseDTO>>() {
         };
-        ResponseEntity<ResponsePageDto<CourseDTO>> result = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+        ResponseEntity<ResponsePageDTO<CourseDTO>> result = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
         return result.getBody();
     }
 

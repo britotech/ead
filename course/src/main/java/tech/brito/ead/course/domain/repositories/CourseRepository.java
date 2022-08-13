@@ -7,4 +7,8 @@ import tech.brito.ead.course.domain.models.Course;
 import java.util.UUID;
 
 public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecificationExecutor<Course> {
+    boolean existsByCourseAndUser(UUID courseId, UUID userId);
+    void saveCourseUser(UUID courseId, UUID userId);
+    void deleteCourseUserByCourse(UUID courseId);
+    void deleteCourseUserByUser(UUID userId);
 }

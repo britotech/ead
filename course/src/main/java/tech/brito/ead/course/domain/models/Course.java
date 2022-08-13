@@ -69,7 +69,7 @@ public class Course extends RepresentationModel<Course> implements Serializable 
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "tb_course_users", joinColumns = @JoinColumn(name = "course_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JoinTable(name = "tb_course_user", joinColumns = @JoinColumn(name = "course_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> users;
 
     @Override

@@ -53,7 +53,7 @@ public class UserController {
     public User updateUser(@PathVariable UUID userId, @RequestBody @Valid UserUpdateDTO userDto) {
         var userSaved = userService.findById(userId);
         modelMapper.map(userDto, userSaved);
-        return userService.save(userSaved);
+        return userService.updateUser(userSaved);
     }
 
     @PutMapping("/{userId}/password")
@@ -64,7 +64,7 @@ public class UserController {
         }
 
         userSaved.setPassword(passwordDTO.getPassword());
-        userService.save(userSaved);
+        userService.updatePassword(userSaved);
         return "Password updated sucessfully";
     }
 
@@ -72,7 +72,7 @@ public class UserController {
     public String updateImage(@PathVariable UUID userId, @RequestBody @Valid ImageUpdateDTO imageDTO) {
         var userSaved = userService.findById(userId);
         userSaved.setImageUrl(imageDTO.getImageUrl());
-        userService.save(userSaved);
+        userService.updateUser(userSaved);
         return "Image updated sucessfully";
     }
 

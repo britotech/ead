@@ -1,8 +1,8 @@
 package tech.brito.ead.authuser.api.models;
 
 import lombok.Data;
-import tech.brito.ead.authuser.enums.CourseLevel;
-import tech.brito.ead.authuser.enums.CourseStatus;
+import tech.brito.ead.authuser.api.models.enums.CourseLevel;
+import tech.brito.ead.authuser.api.models.enums.CourseStatus;
 
 import java.io.Serializable;
 import java.util.UUID;

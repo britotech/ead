@@ -5,11 +5,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import tech.brito.ead.course.domain.exceptions.CourseNotFoundException;
+import tech.brito.ead.course.domain.exceptions.DomainRuleException;
+import tech.brito.ead.course.domain.exceptions.SubscriptionAlreadyExistsException;
+import tech.brito.ead.course.domain.exceptions.UserBlockedException;
 import tech.brito.ead.course.domain.models.Course;
+import tech.brito.ead.course.domain.models.User;
 import tech.brito.ead.course.domain.repositories.CourseRepository;
 import tech.brito.ead.course.domain.repositories.LessonRepository;
 import tech.brito.ead.course.domain.repositories.ModuleRepository;
-import tech.brito.ead.course.domain.repositories.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.UUID;
@@ -19,16 +22,16 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final ModuleRepository moduleRepository;
     private final LessonRepository lessonRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public CourseService(CourseRepository courseRepository,
                          ModuleRepository moduleRepository,
                          LessonRepository lessonRepository,
-                         UserRepository userRepository) {
+                         UserService userService) {
         this.courseRepository = courseRepository;
         this.moduleRepository = moduleRepository;
         this.lessonRepository = lessonRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public Page<Course> findAll(Specification<Course> spec, Pageable pageable) {
@@ -38,6 +41,7 @@ public class CourseService {
     @Transactional
     public void delete(Course course) {
         deleteLinkedModules(course.getId());
+        courseRepository.deleteCourseUserByCourse(course.getId());
         courseRepository.delete(course);
     }
 
@@ -61,23 +65,32 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    private void validateUserInstructor(UUID userInstructor) {
+    private void validateUserInstructor(UUID userId) {
 
-     /*   try {
-            var userDto = authUserClient.getUserById(userInstructor);
-            if (userDto.getType().isStudent()) {
-                throw new DomainRuleException("User must be INSTRUCTOR or ADMIN.");
-            }
-        } catch (HttpStatusCodeException ex) {
-            if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-                throw new DomainRuleException("Instructor not found.");
-            }
+        var user = userService.findOptionalById(userId);
+        if (!user.isPresent()) {
+            throw new DomainRuleException("UserInstructor not found");
+        }
 
-            throw ex;
-        }*/
+        if (user.get().getType().isStudent()) {
+            throw new DomainRuleException("User must be INSTRUCTOR or ADMIN.");
+        }
     }
 
     public Course findById(UUID id) {
         return courseRepository.findById(id).orElseThrow(CourseNotFoundException::new);
+    }
+
+    @Transactional
+    public void saveSubscriptionUserInCourse(Course course, User user) {
+        if (courseRepository.existsByCourseAndUser(course.getId(), user.getId())) {
+            throw new SubscriptionAlreadyExistsException();
+        }
+
+        if (user.getStatus().isBlocked()) {
+            throw new UserBlockedException();
+        }
+
+        courseRepository.saveCourseUser(course.getId(), user.getId());
     }
 }
