@@ -49,7 +49,7 @@ spring:
     resources:
       add-mappings: false
   rabbitmq:
-    addresses: your url -> Example amqps://gerald:1co_MLN9HXdtfPXqx36EsiBNMTBsruKj@talesof.rmq.cloudamqp.com/rivia
+    addresses: amqps://glkaazrv:1co_MLN9HXdtfPXqx36EsiBNMTBsruKj@jackal.rmq.cloudamqp.com/glkaazrv
 
 logging:
   level:

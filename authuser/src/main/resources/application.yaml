@@ -1,80 +1,9 @@
-server:
-  port: 8087
-  servlet:
-    context-path: '/ead-authuser/'
-
-ead:
-  api:
-    url:
-      course: 'http://ead-course-service/ead-course'
-  broker:
-    exchange:
-      userEvent: ead.userevent
-
-eureka:
-  client:
-    service-url:
-      defaultZone: 'http://localhost:8761/eureka'
-  instance:
-    hostname: localhost
-
 spring:
   application:
     name: ead-authuser-service
-  datasource:
-    username: postgres
-    password: masterkey
-    url: jdbc:postgresql://localhost:5432/ead-authuser
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          lob:
-            non_contextual_creation: true
-        format_sql: true
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-  jackson:
-    deserialization:
-      fail-on-ignored-properties: true
-      fail-on-unknown-properties: false
-  mvc:
-    throw-exception-if-no-handler-found: true
-  web:
-    resources:
-      add-mappings: false
-  output:
-    ansi:
-      enabled: always
-  rabbitmq:
-    addresses: your url -> Example amqps://gerald:1co_MLN9HXdtfPXqx36EsiBNMTBsruKj@talesof.rmq.cloudamqp.com/rivia
-
-logging:
-  level:
-    org:
-      springframework:
-        web: DEBUG
-    tech:
-      brito:
-        ead:
-          authuser: INFO
-    root: INFO
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      circuitbreakerInstance:
-        sliding-window-size: 30
-        permitted-number-of-calls-in-half-open-state: 2
-        sliding-window-type: TIME_BASED
-        minimum-number-of-calls: 2
-        wait-duration-in-open-state: 30s
-        failure-rate-threshold: 80
-  retry:
-    instances:
-      retryIntance:
-        max-attempts: 3
-        wait-duration: 5s
-
+  config:
+    import: 'configserver:'
+  cloud:
+    config:
+      discovery:
+        service-id: ead-config-server

@@ -1,0 +1,21 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: ead-config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/britotech/ead-config-server-repo
+          default-label: main
+          username: britotech
+          password: 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
+
+eureka:
+  client:
+    service-url:
+      defaultZone: 'http://localhost:8761/eureka'
+  instance:
+    hostname: localhost
