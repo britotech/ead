@@ -1,9 +1,12 @@
 package tech.brito.ead.course.domain.services;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import tech.brito.ead.course.api.models.NotificationCommandDTO;
+import tech.brito.ead.course.core.publishers.NotificationCommandPublisher;
 import tech.brito.ead.course.domain.exceptions.CourseNotFoundException;
 import tech.brito.ead.course.domain.exceptions.DomainRuleException;
 import tech.brito.ead.course.domain.exceptions.SubscriptionAlreadyExistsException;
@@ -18,20 +21,24 @@ import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Service
+@Log4j2
 public class CourseService {
     private final CourseRepository courseRepository;
     private final ModuleRepository moduleRepository;
     private final LessonRepository lessonRepository;
     private final UserService userService;
+    private final NotificationCommandPublisher notificationCommandPublisher;
 
     public CourseService(CourseRepository courseRepository,
                          ModuleRepository moduleRepository,
                          LessonRepository lessonRepository,
-                         UserService userService) {
+                         UserService userService,
+                         NotificationCommandPublisher notificationCommandPublisher) {
         this.courseRepository = courseRepository;
         this.moduleRepository = moduleRepository;
         this.lessonRepository = lessonRepository;
         this.userService = userService;
+        this.notificationCommandPublisher = notificationCommandPublisher;
     }
 
     public Page<Course> findAll(Specification<Course> spec, Pageable pageable) {
@@ -92,5 +99,24 @@ public class CourseService {
         }
 
         courseRepository.saveCourseUser(course.getId(), user.getId());
+    }
+
+    @Transactional
+    public void saveSubscriptionUserInCourseAndSendNotification(Course course, User user) {
+        saveSubscriptionUserInCourse(course, user);
+        sendSubscriptionNotification(course, user);
+    }
+
+    private void sendSubscriptionNotification(Course course, User user) {
+        try {
+            var notificationDTO = new NotificationCommandDTO();
+            notificationDTO.setTitle(String.format("Bem-vindo(a) ao curso: %s", course.getName()));
+            notificationDTO.setMessage(String.format("%s a sua inscrição foi realizada com sucesso!", user.getFullname()));
+            notificationDTO.setUserId(user.getId());
+
+            notificationCommandPublisher.publishNotificationCommand(notificationDTO);
+        } catch (Exception ex) {
+            log.warn("Error sending notification! -> {}", ex.getMessage());
+        }
     }
 }

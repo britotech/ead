@@ -44,7 +44,7 @@ public class CourseUserController {
             throw new DomainRuleException("User not found");
         }
 
-        courseService.saveSubscriptionUserInCourse(course, user.get());
+        courseService.saveSubscriptionUserInCourseAndSendNotification(course, user.get());
         return "Subscription created sucessfully";
     }
 }

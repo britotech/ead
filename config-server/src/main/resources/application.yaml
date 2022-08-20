@@ -11,7 +11,7 @@ spring:
           uri: https://github.com/britotech/ead-config-server-repo
           default-label: main
           username: britotech
-          password: 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
+          password: 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
 
 eureka:
   client:

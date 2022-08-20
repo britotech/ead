@@ -2,6 +2,8 @@ package tech.brito.ead.notification.domain.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import tech.brito.ead.notification.enums.NotificationStatus;
 
@@ -12,7 +14,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static tech.brito.ead.notification.core.constants.DataConstants.DATE_TIME_FORMAT_UTC;
 
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "tb_notification")
@@ -33,58 +38,10 @@ public class Notification implements Serializable {
 
     @CreationTimestamp
     @Column(name = "creation_date_time", columnDefinition = "timestamp")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_UTC)
     private OffsetDateTime creationDateTime;
     @Enumerated(EnumType.STRING)
     private NotificationStatus status;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public OffsetDateTime getCreationDateTime() {
-        return creationDateTime;
-    }
-
-    public void setCreationDateTime(OffsetDateTime creationDateTime) {
-        this.creationDateTime = creationDateTime;
-    }
-
-    public NotificationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(NotificationStatus status) {
-        this.status = status;
-    }
 
     @Override
     public boolean equals(Object o) {
