@@ -11,11 +11,19 @@ spring:
           uri: https://github.com/britotech/ead-config-server-repo
           default-label: main
           username: britotech
-          password: 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
+          password: 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
+
+ead:
+  configServer:
+    username: configServer
+    password: 'cs123'
+  serviceRegistry:
+    username: serviceRegistry
+    password: 'ead123'
 
 eureka:
   client:
     service-url:
-      defaultZone: 'http://localhost:8761/eureka'
+      defaultZone: 'http://${ead.serviceRegistry.username}:${ead.serviceRegistry.password}@localhost:8761/eureka'
   instance:
     hostname: localhost

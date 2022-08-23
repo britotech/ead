@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS public.tb_user_course;

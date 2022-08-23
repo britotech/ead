@@ -3,6 +3,7 @@ package tech.brito.ead.authuser.domain.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +15,9 @@ import tech.brito.ead.authuser.enums.UserType;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -45,11 +48,10 @@ public class User extends RepresentationModel<User> implements Serializable {
 
     private String username;
 
+    private String fullname;
     private String email;
 
     private String cpf;
-
-    private String fullname;
 
     @JsonIgnore
     private String password;
@@ -65,6 +67,11 @@ public class User extends RepresentationModel<User> implements Serializable {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "tb_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
