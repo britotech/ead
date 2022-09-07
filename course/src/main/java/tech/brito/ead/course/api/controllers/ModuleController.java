@@ -4,10 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import tech.brito.ead.course.domain.models.ModuleDto;
 import tech.brito.ead.course.core.specifications.SpecificationTemplate;
 import tech.brito.ead.course.domain.models.Module;
+import tech.brito.ead.course.domain.models.ModuleDto;
 import tech.brito.ead.course.domain.services.CourseService;
 import tech.brito.ead.course.domain.services.ModuleService;
 
@@ -29,6 +30,7 @@ public class ModuleController {
         this.moduleService = moduleService;
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping("/courses/{courseId}/modules")
     @ResponseStatus(HttpStatus.CREATED)
     public Module saveModule(@PathVariable UUID courseId, @RequestBody @Valid ModuleDto moduleDto) {
@@ -43,6 +45,7 @@ public class ModuleController {
         return moduleService.save(module);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping("/courses/{courseId}/modules/{moduleId}")
     public Module updateModule(@PathVariable UUID courseId, @PathVariable UUID moduleId, @RequestBody @Valid ModuleDto moduleDto) {
         var module = moduleService.findModuleIntoCourse(courseId, moduleId);
@@ -51,6 +54,7 @@ public class ModuleController {
         return moduleService.save(module);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping("/courses/{courseId}/modules/{moduleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteModule(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
@@ -58,6 +62,7 @@ public class ModuleController {
         moduleService.delete(module);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/courses/{courseId}/modules")
     public Page<Module> getAllModules(@PathVariable UUID courseId,
                                       SpecificationTemplate.ModuleSpec spec,
@@ -69,6 +74,7 @@ public class ModuleController {
         return modulePage;
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/courses/{courseId}/modules/{moduleId}")
     public Module getModule(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
         return moduleService.findModuleIntoCourse(courseId, moduleId);

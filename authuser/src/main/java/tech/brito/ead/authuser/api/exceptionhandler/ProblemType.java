@@ -11,6 +11,10 @@ public enum ProblemType {
 	INCOMPREHENSIBLE_MESSAGE("/incomprehensible-message", "Incomprehensible message"),
 	RESOURCE_NOT_FOUND("/resource-not-found", "Resource not found"),
 	ENTITY_IN_USE("/entity-in-use", "Entity in use"),
+
+	ACCESS_DENIED("/access-denied", "Access denied"),
+
+	UNAUTHORIZED("/unauthorized", "Unauthorized"),
 	SUBSCRIPTION_ALREADY_EXISTS("/subscription-already-exists", "subscription already exists"),
 	BUSINESS_RULE_VIOLATION("/business-rule-violation", "Business rule violation");
 

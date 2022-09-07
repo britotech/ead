@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -13,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import tech.brito.ead.authuser.api.models.CourseDTO;
 import tech.brito.ead.authuser.api.models.ResponsePageDTO;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Log4j2
@@ -23,25 +24,24 @@ public class CourseClient {
     String REQUEST_URI_COURSE;
     private final RestTemplate restTemplate;
 
-    static int execucoes = 0;
-
     public CourseClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     @CircuitBreaker(name = "circuitbreakerInstance")
-    public Page<CourseDTO> getAllCoursesByUser(UUID userId, Pageable pageable) {
-        execucoes = execucoes + 1;
-        log.error("DataHora: {} execucoes -> {}", LocalDateTime.now(), execucoes);
-        var url = generateUrlCoursesByUser(userId, pageable);
+    public Page<CourseDTO> getAllCoursesByUser(UUID userId, Pageable pageable, String token) {
+
+        var url = generateUrlCoursesByUser(userId, pageable, token);
         log.info("Url -> {}", url);
-        var responseType = new ParameterizedTypeReference<ResponsePageDTO<CourseDTO>>() {
-        };
-        ResponseEntity<ResponsePageDTO<CourseDTO>> result = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+        var responseType = new ParameterizedTypeReference<ResponsePageDTO<CourseDTO>>() {};
+        ResponseEntity<ResponsePageDTO<CourseDTO>> result = restTemplate.exchange(url,
+                                                                                  HttpMethod.GET,
+                                                                                  generateRequestEntity(token),
+                                                                                  responseType);
         return result.getBody();
     }
 
-    private String generateUrlCoursesByUser(UUID userId, Pageable pageable) {
+    private String generateUrlCoursesByUser(UUID userId, Pageable pageable, String token) {
         var url = new StringBuilder();
         url.append(REQUEST_URI_COURSE);
         url.append("/courses?userId=");
@@ -53,5 +53,11 @@ public class CourseClient {
         url.append("&sort=");
         url.append(pageable.getSort().toString().replaceAll(": ", ","));
         return url.toString();
+    }
+
+    private HttpEntity<String> generateRequestEntity(String token) {
+        var headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        return new HttpEntity<String>("parameters", headers);
     }
 }

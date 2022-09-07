@@ -1,14 +1,12 @@
-package tech.brito.ead.authuser.core.configs.security;
+package tech.brito.ead.course.core.configs.security;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import tech.brito.ead.authuser.domain.models.User;
-import tech.brito.ead.authuser.enums.UserType;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,18 +18,14 @@ public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     private UUID userId;
-    private String username;
-    private String fullname;
-    @JsonIgnore
-    private String password;
-    private String email;
+
     private Collection<? extends GrantedAuthority> authorities;
 
-    public static UserDetailsImpl build(User user) {
-        var authorities =
-                user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getAuthority())).collect(Collectors.toList());
+    public static UserDetailsImpl build(UUID userId, String rolesStr) {
 
-        return new UserDetailsImpl(user.getId(), user.getUsername(), user.getFullname(), user.getPassword(), user.getEmail(), authorities);
+        var authorities = Arrays.stream(rolesStr.split(",")).map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
+
+        return new UserDetailsImpl(userId, authorities);
     }
 
     @Override
@@ -41,12 +35,12 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return null;
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return null;
     }
 
     @Override
@@ -70,6 +64,6 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public boolean containsAdminPermission() {
-        return authorities.stream().filter(user -> user.getAuthority().contains(UserType.ADMIN.name())).findAny().isPresent();
+        return authorities.stream().filter(user -> user.getAuthority().contains("ADMIN")).findAny().isPresent();
     }
 }

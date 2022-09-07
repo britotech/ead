@@ -3,10 +3,8 @@ package tech.brito.ead.authuser.api.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.clients.CourseClient;
 import tech.brito.ead.authuser.api.models.CourseDTO;
 import tech.brito.ead.authuser.domain.services.UserService;
@@ -24,9 +22,12 @@ public class UserCourseController {
         this.courseClient = courseClient;
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/users/{userId}/courses")
-    public Page<CourseDTO> getAllCoursesByUser(@PathVariable UUID userId, @PageableDefault(sort = "name") Pageable pageable) {
+    public Page<CourseDTO> getAllCoursesByUser(@PathVariable UUID userId,
+                                               @PageableDefault(sort = "name") Pageable pageable,
+                                               @RequestHeader("Authorization") String token) {
         var user = userService.findById(userId);
-        return courseClient.getAllCoursesByUser(user.getId(), pageable);
+        return courseClient.getAllCoursesByUser(user.getId(), pageable, token);
     }
 }

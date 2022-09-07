@@ -5,10 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.models.ImageUpdateDTO;
 import tech.brito.ead.authuser.api.models.PasswordUpdateDTO;
 import tech.brito.ead.authuser.api.models.UserUpdateDTO;
+import tech.brito.ead.authuser.core.configs.security.AuthenticationCurrentUserService;
 import tech.brito.ead.authuser.core.specifications.SpecificationTemplate;
 import tech.brito.ead.authuser.domain.exceptions.DomainRuleException;
 import tech.brito.ead.authuser.domain.models.User;
@@ -29,11 +31,15 @@ public class UserController {
 
     private final ModelMapper modelMapper;
 
-    public UserController(UserService userService, ModelMapper modelMapper) {
+    private final AuthenticationCurrentUserService currentUserService;
+
+    public UserController(UserService userService, ModelMapper modelMapper, AuthenticationCurrentUserService currentUserService) {
         this.userService = userService;
         this.modelMapper = modelMapper;
+        this.currentUserService = currentUserService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
     public Page<User> getAllUsers(SpecificationTemplate.UserSpec spec, @PageableDefault(sort = "username") Pageable pageable) {
         Page<User> userPage = userService.findAll(spec, pageable);
@@ -44,8 +50,10 @@ public class UserController {
         return userPage;
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/{userId}")
     public User getUser(@PathVariable UUID userId) {
+        currentUserService.validatePermission(userId);
         return userService.findById(userId);
     }
 

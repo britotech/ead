@@ -18,3 +18,11 @@ CREATE TABLE IF NOT EXISTS public.tb_user
 );
 
 ALTER TABLE IF EXISTS public.tb_user OWNER to postgres;
+
+INSERT INTO public.tb_user(id, creation_date_time, last_update_date_time, username, email, cpf, fullname, password, status, type)
+VALUES ('cf1c2190-a2cc-43e3-ab13-f26d9a21c90f', '2022-09-07 10:00:00', '2022-09-07 10:00:00', 'admin', 'admin@brito.tech', '75033583000', 'Administrator', '$2a$10$goclcAykrE8Hz.TmSGsgeuLdDEhztR3Gdr39WtBSrn7I5URu/qlvi','ACTIVE', 'ADMIN');
+
+
+INSERT INTO public.tb_user(id, creation_date_time, last_update_date_time, username, email, cpf, fullname, password, status, type)
+VALUES ('b01832b6-592c-49fb-b99d-823a0a3a446e', '2022-09-07 10:00:00', '2022-09-07 10:00:00', 'anderson', 'anderson@brito.tech',
+        '78413906024', 'Anderson Brito Garcia', '$2a$10$goclcAykrE8Hz.TmSGsgeuLdDEhztR3Gdr39WtBSrn7I5URu/qlvi','ACTIVE', 'INSTRUCTOR');

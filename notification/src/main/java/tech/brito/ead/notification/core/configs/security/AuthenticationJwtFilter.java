@@ -1,13 +1,13 @@
-package tech.brito.ead.authuser.core.configs.security;
+package tech.brito.ead.notification.core.configs.security;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import tech.brito.ead.authuser.domain.exceptions.ValidationJwtException;
+import tech.brito.ead.notification.domain.exceptions.ValidationJwtException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,9 +22,6 @@ public class AuthenticationJwtFilter extends OncePerRequestFilter {
     @Autowired
     JwtProvider jwtProvider;
 
-    @Autowired
-    UserDetailsServiceImpl userDetailsService;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -32,9 +29,12 @@ public class AuthenticationJwtFilter extends OncePerRequestFilter {
         try {
             var jwtStr = getTokenHeader(request);
             validateJwt(jwtStr);
+
             var userId = jwtProvider.getSubjectJwt(jwtStr);
-            var userDetails = userDetailsService.loadUserById(UUID.fromString(userId));
+            var rolesStr = jwtProvider.getClaimNameJwt(jwtStr, "roles");
+            var userDetails = UserDetailsImpl.build(UUID.fromString(userId), rolesStr);
             var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (ValidationJwtException ex) {
@@ -47,8 +47,9 @@ public class AuthenticationJwtFilter extends OncePerRequestFilter {
     }
 
     private String getTokenHeader(HttpServletRequest request) {
+
         var headerAuth = request.getHeader("Authorization");
-        if (StringUtils.isNotBlank(headerAuth) && headerAuth.startsWith("Bearer")) {
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer")) {
             return headerAuth.substring(7, headerAuth.length());
         }
 
@@ -56,7 +57,7 @@ public class AuthenticationJwtFilter extends OncePerRequestFilter {
     }
 
     private void validateJwt(String jwtStr) {
-        if (StringUtils.isBlank(jwtStr)) {
+        if (!StringUtils.hasText(jwtStr)) {
             throw new ValidationJwtException("Authentication error: Invalid JWT");
         }
 

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.course.core.specifications.SpecificationTemplate;
 import tech.brito.ead.course.domain.exceptions.DomainRuleException;
@@ -27,6 +28,7 @@ public class CourseUserController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @GetMapping("/courses/{courseId}/users")
     public Page<User> getAllUsersByCourse(SpecificationTemplate.UserSpec spec,
                                           @PathVariable UUID courseId,
@@ -35,6 +37,7 @@ public class CourseUserController {
         return userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), pageable);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @PostMapping("/courses/{courseId}/users/subscription")
     @ResponseStatus(HttpStatus.CREATED)
     public String saveSubscriptionUserInCourse(@PathVariable UUID courseId, @RequestBody @Valid SubscriptionDto subscriptionDto) {

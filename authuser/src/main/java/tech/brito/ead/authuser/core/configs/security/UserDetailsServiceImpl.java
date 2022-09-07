@@ -1,11 +1,13 @@
 package tech.brito.ead.authuser.core.configs.security;
 
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import tech.brito.ead.authuser.domain.exceptions.UserNotFoundException;
 import tech.brito.ead.authuser.domain.repositories.UserRepository;
+
+import java.util.UUID;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -20,7 +22,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var user = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User not found with username: %s", username)));
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("User not found with username: %s", username)));
+
+        return UserDetailsImpl.build(user);
+    }
+
+    public UserDetails loadUserById(UUID userId) {
+        var user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(String.format("User not found with id: %s", userId)));
 
         return UserDetailsImpl.build(user);
     }

@@ -1,5 +1,6 @@
 package tech.brito.ead.authuser.api.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tech.brito.ead.authuser.api.models.InstructorDTO;
 import tech.brito.ead.authuser.domain.models.User;
@@ -19,11 +20,10 @@ public class InstructorController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/subscription")
     public User saveSubscriptionInstructor(@RequestBody @Valid InstructorDTO instructorDTO) {
         var user = userService.findById(instructorDTO.getUserId());
-        user.setType(UserType.INSTRUCTOR);
-
-        return userService.updateUser(user);
+        return userService.subscriptionInstructor(user);
     }
 }

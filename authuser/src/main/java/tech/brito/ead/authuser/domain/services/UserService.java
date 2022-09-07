@@ -14,6 +14,7 @@ import tech.brito.ead.authuser.domain.models.User;
 import tech.brito.ead.authuser.domain.repositories.UserRepository;
 import tech.brito.ead.authuser.enums.ActionType;
 import tech.brito.ead.authuser.enums.RoleType;
+import tech.brito.ead.authuser.enums.UserType;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -50,20 +51,37 @@ public class UserService {
 
     @Transactional
     public User saveUser(User user) {
-        var role = roleService.findByName(RoleType.ROLE_STUDENT);
-        user.getRoles().add(role);
+        addRoleToUser(user, RoleType.ROLE_STUDENT);
 
-        user = save(user);
+        user = validateAndSave(user);
+        publisherUserEvent(user, ActionType.CREATE);
+        return user;
+    }
+
+    private void addRoleToUser(User user, RoleType roleType) {
+        var role = roleService.findByName(roleType);
+        user.getRoles().add(role);
+    }
+
+    private void publisherUserEvent(User user, ActionType actionType) {
         var userDTO = modelMapper.map(user, UserEventDTO.class);
-        userEventPublisher.publishUserEvent(userDTO, ActionType.CREATE);
+        userEventPublisher.publishUserEvent(userDTO, actionType);
+    }
+
+    @Transactional
+    public User subscriptionInstructor(User user) {
+        user.setType(UserType.INSTRUCTOR);
+        addRoleToUser(user, RoleType.ROLE_INSTRUCTOR);
+
+        user = userRepository.save(user);
+        publisherUserEvent(user, ActionType.UPDATE);
         return user;
     }
 
     @Transactional
     public User updateUser(User user) {
-        user = save(user);
-        var userDTO = modelMapper.map(user, UserEventDTO.class);
-        userEventPublisher.publishUserEvent(userDTO, ActionType.UPDATE);
+        user = validateAndSave(user);
+        publisherUserEvent(user, ActionType.UPDATE);
         return user;
     }
 
@@ -72,7 +90,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    private User save(User user) {
+    private User validateAndSave(User user) {
         validateEmailAllowed(user);
         validateUsernameAllowed(user);
 
@@ -102,7 +120,6 @@ public class UserService {
     @Transactional
     public void delete(User user) {
         userRepository.delete(user);
-        var userDTO = modelMapper.map(user, UserEventDTO.class);
-        userEventPublisher.publishUserEvent(userDTO, ActionType.DELETE);
+        publisherUserEvent(user, ActionType.DELETE);
     }
 }

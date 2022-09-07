@@ -1,4 +1,4 @@
-package tech.brito.ead.authuser.core.configs.security;
+package tech.brito.ead.notification.core.configs.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,21 +14,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import tech.brito.ead.authuser.enums.RoleType;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
-    private static final String[] AUTH_WHITELIST = {"/auth/**"};
-
-    private final UserDetailsServiceImpl userDetailsService;
-
     private final AuthenticationEntryPointImpl authenticationEntryPoint;
 
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthenticationEntryPointImpl authenticationEntryPoint) {
-        this.userDetailsService = userDetailsService;
+    public WebSecurityConfig(AuthenticationEntryPointImpl authenticationEntryPoint) {
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
@@ -39,34 +33,23 @@ public class WebSecurityConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-
-        var hierarchy = new StringBuilder();
-        hierarchy.append(RoleType.ROLE_ADMIN.name()).append(" > ").append(RoleType.ROLE_INSTRUCTOR.name()).append("\n");
-        hierarchy.append(RoleType.ROLE_INSTRUCTOR.name()).append(" > ").append(RoleType.ROLE_STUDENT.name()).append("\n");
-        hierarchy.append(RoleType.ROLE_STUDENT.name()).append(" > ").append(RoleType.ROLE_USER.name());
-
+        var hierarchy = "ROLE_ADMIN > ROLE_INSTRUCTOR \n ROLE_INSTRUCTOR > ROLE_STUDENT \n ROLE_STUDENT > ROLE_USER";
         var roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy(hierarchy.toString());
+        roleHierarchy.setHierarchy(hierarchy);
         return roleHierarchy;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
+                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(AUTH_WHITELIST)
-                .permitAll()
-                .anyRequest()
-                .authenticated()
+                .anyRequest().authenticated()
                 .and()
-                .csrf()
-                .disable();
+                .csrf().disable();
 
         http.addFilterBefore(authenticationJwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
