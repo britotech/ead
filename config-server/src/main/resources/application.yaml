@@ -11,15 +11,15 @@ spring:
           uri: https://github.com/britotech/ead-config-server-repo
           default-label: main
           username: britotech
-          password: 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
+          password: ${SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD}
 
 ead:
   configServer:
     username: configServer
-    password: 'cs123'
+    password: ${EAD_CONFIGSERVER_PASSWORD}
   serviceRegistry:
     username: serviceRegistry
-    password: 'ead123'
+    password: ${EAD_SERVICEREGISTRY_PASSWORD}
 
 eureka:
   client:

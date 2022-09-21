@@ -8,4 +8,4 @@ spring:
       discovery:
         service-id: ead-config-server
       username: configServer
-      password: 'cs123'
+      password: ${EAD_CONFIGSERVER_PASSWORD}

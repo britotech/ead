@@ -4,7 +4,7 @@ server:
 ead:
   serviceRegistry:
     username: serviceregistry
-    password: 'ead123'
+    password: ${EAD_SERVICEREGISTRY_PASSWORD}
 
 eureka:
   client:
