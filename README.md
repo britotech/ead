@@ -1,6 +1,6 @@
 ## EAD - APi Rest de microserviços de integração de usuários e cursos.
 
-Desenvolvido para teste de tecnologias do ecosistema springe padrões de microserviços.
+Desenvolvido para teste de tecnologias do ecosistema spring padrões de microserviços.
 
 * service-registry: Responsável por registrar todos os microserviços.
 * config-server: Responsável por guardar as configurações gerais de todos microserviços.
